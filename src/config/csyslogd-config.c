@@ -172,10 +172,11 @@ int Read_CSyslog(XML_NODE node, void *config, __attribute__((unused)) void *conf
                 goto fail;
             }
         } else if (strcmp(node[i]->element, xml_syslog_protocol) == 0) {
-            if (strcasecmp(node[i]->content, "udp") == 0) {
+            if (strcmp(node[i]->content, "udp") == 0) {
                 syslog_config[s]->protocol = SYSLOG_PROTO_UDP;
-            } else if (strcasecmp(node[i]->content, "tcp") == 0) {
+            } else if (strcmp(node[i]->content, "tcp") == 0) {
                 syslog_config[s]->protocol = SYSLOG_PROTO_TCP;
+                merror(XML_VALUEERR, node[i]->content, syslog_config[s]->protocol );
             } else {
                 merror(XML_VALUEERR, node[i]->element, node[i]->content);
                 goto fail;                

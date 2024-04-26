@@ -90,7 +90,10 @@ void OS_CSyslogD(SyslogConfig **syslog_config)
         mdebug2("Resolving server hostname: %s", syslog_config[s]->server);
         resolve_hostname(&syslog_config[s]->server, 5);
 
-        syslog_config[s]->socket = OS_ConnectUDP(syslog_config[s]->port, get_ip_from_resolved_hostname(syslog_config[s]->server), 0, 0);
+        if (syslog_config->protocol == SYSLOG_PROTO_TCP)
+            syslog_config->socket = OS_ConnectTCP(syslog_config->port, get_ip_from_resolved_hostname(syslog_config->server), 0, 0);
+        else 
+            syslog_config->socket = OS_ConnectUDP(syslog_config->port, get_ip_from_resolved_hostname(syslog_config->server), 0, 0);
 
         if (syslog_config[s]->socket < 0) {
             merror(CONNS_ERROR, syslog_config[s]->server, syslog_config[s]->port, "udp", strerror(errno));
