@@ -314,14 +314,14 @@ int OS_Alert_SendSyslog(alert_data *al_data, SyslogConfig *syslog_config) {
     }
 
     if (syslog_config->protocol == SYSLOG_PROTO_TCP) {
-        if (OS_SendTCPbySize(syslog_config->socket, strlen(msg), msg) != 0) {
+        if (OS_SendTCPbySize(syslog_config->socket, strlen(syslog_msg), syslog_msg) != 0) {
             OS_CloseSocket(syslog_config->socket);
             syslog_config->socket = -1;
             merror(ERROR_SENDING_MSG, syslog_config->server);
         }
     }
     else {
-        if (OS_SendUDPbySize(syslog_config->socket, strlen(msg), msg) != 0) {
+        if (OS_SendUDPbySize(syslog_config->socket, strlen(syslog_msg), syslog_msg) != 0) {
             OS_CloseSocket(syslog_config->socket);
             syslog_config->socket = -1;
             merror(ERROR_SENDING_MSG, syslog_config->server);
