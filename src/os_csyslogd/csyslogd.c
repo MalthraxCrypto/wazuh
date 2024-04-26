@@ -96,10 +96,15 @@ void OS_CSyslogD(SyslogConfig **syslog_config)
             syslog_config->socket = OS_ConnectUDP(syslog_config->port, get_ip_from_resolved_hostname(syslog_config->server), 0, 0);
 
         if (syslog_config[s]->socket < 0) {
-            merror(CONNS_ERROR, syslog_config[s]->server, syslog_config[s]->port, "udp", strerror(errno));
+            if (syslog_config->protocol == SYSLOG_PROTO_TCP)
+                merror(CONNS_ERROR, syslog_config[s]->server, syslog_config[s]->port, "tcp", strerror(errno));
+            else
+                merror(CONNS_ERROR, syslog_config[s]->server, syslog_config[s]->port, "udp", strerror(errno));
         } else {
-            minfo("Forwarding alerts via syslog to: '%s:%d'.",
-                   syslog_config[s]->server, syslog_config[s]->port);
+            if (syslog_config->protocol == SYSLOG_PROTO_TCP)
+                minfo("Forwarding alerts via syslog to: '%s:%d' via TCP.", syslog_config[s]->server, syslog_config[s]->port);
+            else
+                minfo("Forwarding alerts via syslog to: '%s:%d' via UDP.", syslog_config[s]->server, syslog_config[s]->port);
         }
     }
 
