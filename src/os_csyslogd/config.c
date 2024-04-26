@@ -48,6 +48,7 @@ cJSON *getCsyslogConfig(void) {
         cJSON *cfg = cJSON_CreateObject();
         if (syslog_config[i]->server) cJSON_AddStringToObject(cfg,"server",syslog_config[i]->server);
         cJSON_AddNumberToObject(cfg,"port",syslog_config[i]->port);
+        cJSON_AddNumberToObject(cfg,"protocol",syslog_config[i]->protocol);
         cJSON_AddNumberToObject(cfg,"level",syslog_config[i]->level);
         if (syslog_config[i]->group) {
             cJSON *group_list = cJSON_CreateArray();

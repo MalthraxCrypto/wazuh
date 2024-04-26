@@ -21,6 +21,7 @@ typedef struct _SyslogConfig {
     unsigned int *rule_id;
     unsigned int priority;
     unsigned int use_fqdn;
+    unsigned int protocol;
     int socket;
 
     char *server;
@@ -31,6 +32,10 @@ typedef struct _SyslogConfig {
 struct SyslogConfig_holder {
     SyslogConfig **data;
 };
+
+/* Syslog Protocol */
+#define SYSLOG_PROTO_UDP 0
+#define SYSLOG_PROTO_TCP 1
 
 /* Syslog formats */
 #define DEFAULT_CSYSLOG  0

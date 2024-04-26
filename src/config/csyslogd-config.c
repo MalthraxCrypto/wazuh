@@ -25,6 +25,7 @@ int Read_CSyslog(XML_NODE node, void *config, __attribute__((unused)) void *conf
     const char *xml_syslog_group = "group";
     const char *xml_syslog_location = "location";
     const char *xml_syslog_use_fqdn = "use_fqdn";
+    const char *xml_syslog_protocol = "protocol";
 
     struct SyslogConfig_holder *config_holder = (struct SyslogConfig_holder *)config;
     SyslogConfig **syslog_config = config_holder->data;
@@ -49,6 +50,7 @@ int Read_CSyslog(XML_NODE node, void *config, __attribute__((unused)) void *conf
     syslog_config[s]->port = 514;
     syslog_config[s]->format = DEFAULT_CSYSLOG;
     syslog_config[s]->use_fqdn = 0;
+    syslog_config[s]->protocol = SYSLOG_PROTO_UDP;
     /* local 0 facility (16) + severity 4 - warning. --default */
     syslog_config[s]->priority = (16 * 8) + 4;
 
@@ -169,6 +171,16 @@ int Read_CSyslog(XML_NODE node, void *config, __attribute__((unused)) void *conf
                        syslog_config[s]->group->error);
                 goto fail;
             }
+        } else if (strcmp(node[i]->element, xml_syslog_protocol) == 0) {
+            if (strcasecmp(node[i]->content, "udp") == 0) {
+                syslog_config[s]->protocol = SYSLOG_PROTO_UDP;
+            } else if (strcasecmp(node[i]->content, "tcp") == 0) {
+                syslog_config[s]->protocol = SYSLOG_PROTO_TCP;
+            } else {
+                merror(XML_VALUEERR, node[i]->element, node[i]->content);
+                goto fail;                
+            }
+        
         } else {
             merror(XML_INVELEM, node[i]->element);
             goto fail;
