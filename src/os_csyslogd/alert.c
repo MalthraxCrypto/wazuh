@@ -23,6 +23,7 @@ int OS_Alert_SendSyslog(alert_data *al_data, SyslogConfig *syslog_config) {
     char *tstamp;
     char *hostname;
     char syslog_msg[OS_MAXSTR];
+    char tcp_syslog_msg[OS_MAXSTR];
 
     /* Invalid socket, reconnect */
     if (syslog_config->socket < 0) {
@@ -314,7 +315,9 @@ int OS_Alert_SendSyslog(alert_data *al_data, SyslogConfig *syslog_config) {
     }
 
     if (syslog_config->protocol == SYSLOG_PROTO_TCP) {
-        if (OS_SendTCPbySize(syslog_config->socket, strlen(syslog_msg), syslog_msg) != 0) {
+        /* append a carriage return per rfc6587 */
+        snprintf(tcp_syslog_msg, "%s\n", syslog_msg);
+        if (OS_SendTCPbySize(syslog_config->socket, strlen(tcp_syslog_msg), tcp_syslog_msg) != 0) {
             OS_CloseSocket(syslog_config->socket);
             syslog_config->socket = -1;
             merror(ERROR_SENDING_MSG, syslog_config->server);
@@ -342,6 +345,7 @@ int OS_Alert_SendSyslog_JSON(cJSON *json_data, SyslogConfig *syslog_config) {
     char * string;
     int i;
     char msg[OS_MAXSTR];
+    char tcp_syslog_msg[OS_MAXSTR];
     struct tm tm = { .tm_sec = 0 };
     time_t now;
     char * end;
@@ -461,7 +465,9 @@ int OS_Alert_SendSyslog_JSON(cJSON *json_data, SyslogConfig *syslog_config) {
     mdebug2("OS_Alert_SendSyslog_JSON(): sending '%s'", msg);
 
     if (syslog_config->protocol == SYSLOG_PROTO_TCP) {
-        if (OS_SendTCPbySize(syslog_config->socket, strlen(msg), msg) != 0) {
+        /* append a carriage return per rfc6587 */
+        snprintf(tcp_syslog_msg, "%s\n", msg);
+        if (OS_SendTCPbySize(syslog_config->socket, strlen(tcp_syslog_msg), tcp_syslog_msg) != 0) {
             OS_CloseSocket(syslog_config->socket);
             syslog_config->socket = -1;
             merror(ERROR_SENDING_MSG, syslog_config->server);
